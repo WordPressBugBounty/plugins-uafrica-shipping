@@ -1,10 +1,11 @@
-=== Bob Go smart shipping solution ===
+=== Bob Go smart shipping solution for WooCommerce ===
+
 Contributors: bobgroup, janwoostendorp
-Tags: shipping, gutenberg, blocks, gutenberg blocks, block, fulfilment
+Tags: courier, shipping, e-commerce, ecommerce, shipping rates, rates at checkout, woocommerce, delivery, parcel delivery, logistics, checkout shipping, order fulfillment
 Requires at least: 5.0
 Tested up to: 6.4
 Requires PHP: 7.0.0
-Stable tag: 2.5.22
+Stable tag: 3.0.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -13,37 +14,41 @@ Smart shipping and order management solution in South Africa
 == Description ==
 
 #__Smart shipping solution__
-Orders are automatically synchronised from your WooCommerce store, making it easy to generate electronic shipping labels with one click. Receive quotes from multiple couriers (no additional courier accounts are needed), select the courier you wish to use, print the shipping label and request collection from the courier all from one easy-to-use interface. Your customers will then receive automatic updates by email on the status of their orders with online tracking within your own store.
+Orders are automatically synchronised from your WooCommerce store, making it easy to generate electronic shipping labels with one click. Receive quotes and ship with multiple delivery partners, whilst managing everything - including billing - within a single interface.
 
-Courier solutions currently include The Courier Guy, DPD Laser, Internet Express, SkyNet and RAM.
+Once products are shipped, customers will automatically be kept up to date with Bob Go customer tracking notification emails.
+
+Delivery partners include The Courier Guy, Internet Express, SkyNet, RAM, Fastway, Pargo and Bob Box, Bob Group’s very own locker and counter pickup solution.
 
 #__Streamline your order processes__
-Easily integrate Bob Go with your ecommerce stores, sync with your sales channels and automatically pull your orders from your store. Use features like the address book and fulfillment rules to customise your fulfillment processes to best suit your requirements. Bulk fulfillments, manifests and downloadable packing slips are also available for your convenience.
+Easily integrate Bob Go with your ecommerce stores, sync with your sales channels and automatically pull orders from your store. Use features like the address book and rule engine to customise your shipping processes to best suit your requirements. Bulk fulfillments, manifests and downloadable packing slips are also available for your convenience.
 
 #__Other features include:__
-- Mobile-friendly dashboard
-- User roles
-- Shipments without orders
-- VAT-Inclusive rates
-- Custom saved filters
+- Multiple user roles, including a shipping agent user role linked to shipping classes or vendors (Dokan plugin)
+- Creating manual orders and/or shipments
+- Rates at checkout
+- Rule engine automations
+- VAT-inclusive shipping rates
+- Custom-branded tracking notification emails (from Starter plan)
+- Promotions in tracking notifications  (Advanced and Premium plans only)
+- Zebra sticker waybill integrations (Advanced and Premium plans only)
+- Open API
 
 #__Manage the shipping rates you charge your customers at checkout__
-__Rates at checkout__ is a Bob Go service that allows accounts to set up shipping rates that will be charged to their buyers at checkout. These rates will be configured based on certain criteria and can be set up for different service levels with other specific requirements.
+__Rates at checkout__ is a Bob Go service that allows accounts to set up shipping rates that will be charged to their buyers at checkout. These rates will be configured based on certain criteria and can be set up for different service levels with other specific requirements. As an additional option, you can allow customers to select a collection locker or counter which will automatically be presented when a pickup location is available within their address radius.
 
 == Screenshots ==
 
-1. Image of the orders page on the Bob Go app
-2. Image of the shipment creation page on the Bob Go app
-3. Image of the rates at checkout page on the Bob Go app
-4. Image of the rates at checkout setup on the Bob Go app
-5. Image of the tracking page on the Bob Go app
-6. Image of the settings page on the Bob Go app
-7. Image of the Bob Go dashboard on mobile
-8. Image of the quick fulfillment on mobile
-9. Image of the shipments page on mobile
-10. Image of a successful fulfillment on mobile
-11. Image of the address book on mobile
-12. Image of the tracking page on mobile
+1. Image of the dashboard page rollup on the Bob Go app
+2. Image of the dashboard page stats on the Bob Go app
+3. Image of the orders page on the Bob Go app
+4. Image of the shipment page on the Bob Go app
+5. Image of adding a sales channel on the Bob Go app
+6. Image of the rates at checkout setup on the Bob Go app
+7. Image of shipping page settings to set up packages on the Bob Go app
+8. Image of the rule engine page on the Bob Go app
+9. Image of the resource hub page on the Bob Go app
+10. Image of Bob Go rates at checkout on a Woocommerce store
 
 == Installation ==
 
@@ -67,9 +72,18 @@ You must use your admin site URL to integrate your WooCommerce store to the Bob 
 12. To ensure access, tick the box next to “Use alternative authentication method”.
 
 ##Support
-[Click here](https://www.bobgo.co.za/help)
+[Book your seat at our next webinar](https://www.bobgo.co.za/webinar)
+[Help centre](https://help.bobgo.co.za/portal/en/home)
+[Contact us](https://www.bobgo.co.za/contact)
 
 == Changelog ==
+
+= 3.0.3 =
+* Update the plugin listing content
+* Send the custom suburb field in the rates at checkout requests
+* Add support for custom suburb field for WooCommerce Checkout Blocks
+* Ensure backwards compatibility for the custom suburb field for Classic Checkout
+* Declare WooCommerce Cart and Checkout Blocks compatibility
 
 = 2.5.22 =
 * Declare and implement HPOS compatibility

@@ -10,6 +10,7 @@ namespace uAfrica_Shipping\app;
 class Shortcode {
 
 	const HANDLE = 'uafrica-shipping-shortcode';
+	const HANDLE_SUBURB = 'uafrica-shipping-suburb-shortcode';
 
 	/**
 	 * Register the style and scripts of the shortcode.
@@ -38,6 +39,18 @@ class Shortcode {
 			array(),
 			UAFRICA_SHIPPING_VERSION
 		);
+
+		// Conditionally enqueue the suburb script for the CLASSIC checkout page
+		// is_checkout is only supported for CLASSIC checkout pages, not checkout blocks
+		if (is_checkout()) {
+			wp_enqueue_script(
+				self::HANDLE_SUBURB,
+				UAFRICA_SHIPPING_URL . 'assets/build/checkout-suburb.js',
+				array(),
+				UAFRICA_SHIPPING_VERSION,
+				true
+			);
+		}
 	}
 
 	/**

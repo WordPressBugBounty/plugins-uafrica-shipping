@@ -16,9 +16,21 @@ class Block {
 	 */
 	public static function register_block() {
 		$script_asset_path = UAFRICA_SHIPPING_BUILD_DIR . 'index.asset.php';
+		// If the script asset file doesn't exist, gracefully exit and notify admin users
 		if ( ! file_exists( $script_asset_path ) ) {
-			wp_die( '"uafrica/shipping" block not found. You need to run `npm start` or `npm run build`.' );
+			if ( is_admin() ) {
+				add_action( 'admin_notices', function() {
+					?>
+					<div class="notice notice-error">
+						<p><?php esc_html_e( '"uafrica/shipping" block not found. Please run `npm start` or `npm run build` to resolve the issue.', 'uafrica-shipping' ); ?></p>
+					</div>
+					<?php
+				});
+			}
+
+			return; // Exit early to prevent block registration
 		}
+
 		$script_asset = require $script_asset_path;
 		wp_register_script(
 			self::HANDLE . '-editor',

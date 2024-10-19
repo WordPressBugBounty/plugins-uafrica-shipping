@@ -72,7 +72,6 @@ class Admin {
 
 		$checked = checked( 1, $current_val, false );
 		$html    = '<input type="checkbox" name="uafrica[suburb_at_checkout]" value="1" id="suburb_checkbox" ' . $checked . '/>';
-		$html    .= '<label for="suburb_checkbox" style="color:#d97426;margin-left: 10px;"><strong>Please note:</strong> This option is currently not supported for WooCommerce Cart and Checkout Blocks.</label>';
 		echo $html;
 	}
 
@@ -221,6 +220,7 @@ class Admin {
 	 * @return array mixed
 	 */
 	public static function register_shipping_method( array $methods ): array {
+
 		$methods['your_shipping_method'] = '\uAfrica_Shipping\app\Shipping';
 
 		return $methods;

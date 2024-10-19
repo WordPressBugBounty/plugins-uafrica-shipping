@@ -188,8 +188,8 @@ class Shipping extends \WC_Shipping_Method {
 	 *
 	 * @return array
 	 */
-	protected function format_destination( array $package ): array {
-		$formatted_destination = array(
+	protected function format_destination(array $package): array {
+		$formatted_destination = [
 			'country'      => $package['destination']['country'],
 			'postal_code'  => $package['destination']['postcode'],
 			'province'     => '',
@@ -203,22 +203,30 @@ class Shipping extends \WC_Shipping_Method {
 			'email'        => null,
 			'address_type' => null,
 			'company_name' => '',
-			'shipping_suburb' => '',
-		);
+		];
 
+		// Dynamically check if Checkout Blocks are used
+		$is_checkout_blocks = isset( $package['destination']['is_checkout_blocks'] ) && $package['destination']['is_checkout_blocks'] === 'true';
 
-		// Suburb
-		if ( ! empty( $package['destination']['shipping_suburb'] ) ) {
-			$formatted_destination['shipping_suburb'] = $package['destination']['shipping_suburb'];
+		if ( $is_checkout_blocks ) {
+			// Checkout Blocks Suburb
+			$formatted_destination['cb_shipping_suburb'] = $package['destination']['cb_shipping_suburb'];
+			$formatted_destination['is_checkout_blocks'] = 'true';
+		} else {
+			// Classic checkout suburb
+			if ( isset( $package['destination']['shipping_suburb'] ) ) {
+				$formatted_destination['shipping_suburb'] = $package['destination']['shipping_suburb'];
+			}
 		}
 
 		// Provinces
-        if ( ! empty( $package['destination']['state'] ) ) {
-        	$formatted_destination['province'] = $package['destination']['state'];
-        }
+		if ( ! empty( $package['destination']['state'] ) ) {
+			$formatted_destination['province'] = $package['destination']['state'];
+		}
 
 		return $formatted_destination;
 	}
+
 
 	/**
 	 * Format the origin for the API.
@@ -461,4 +469,5 @@ class Shipping extends \WC_Shipping_Method {
 			),
 		);
 	}
+
 }

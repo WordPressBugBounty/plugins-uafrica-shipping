@@ -83,7 +83,7 @@ $svg_url = UAFRICA_SHIPPING_URL . 'assets/icons/';
 
         <div class="branding">
             <img id="show_branding" class="image"
-                 src="https://img.bob.co.za/bobgo/image/upload/bobgo-logos/bobgo_logo_smart_shipping_black.png?tr=w-400&ts=20231024"
+                 src="https://ik.imagekit.io/z1viz85yxs/prod-v3/bobgo/corporate-identity/bobgo_logo_smart_shipping_black.png?tr=w-400"
                  alt="Bob Go logo">
         </div>
     </div><!-- .shipping-step-status -->
