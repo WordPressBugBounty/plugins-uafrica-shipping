@@ -112,7 +112,7 @@ class Shipping extends \WC_Shipping_Method {
 			return;
 		}
 
-		$url = UAFRICA_SHIPPING_API_SHIPPING_METHODS_V3;
+        $url = UAFRICA_SHIPPING_API_SHIPPING_METHODS_V3;
 		$post_options = [
 			'headers' 	  => array( 'Content-Type' => 'application/json; charset=utf-8' ),
 			'body'        => json_encode( $this->get_api_formatted_body( $package ) ),
@@ -189,13 +189,20 @@ class Shipping extends \WC_Shipping_Method {
 	 * @return array
 	 */
 	protected function format_destination(array $package): array {
+
+		// When the Dokan plugin is active the address1 field saves in the address field and the address1 field is empty
+		$address = $package['destination']['address_1'] ?? '';  // Fallback to empty string if not set
+		if (empty($address) && !empty($package['destination']['address'])) {
+			$address = $package['destination']['address'];
+		}
+
 		$formatted_destination = [
 			'country'      => $package['destination']['country'],
 			'postal_code'  => $package['destination']['postcode'],
 			'province'     => '',
 			'city'         => $package['destination']['city'],
 			'name'         => null,
-			'address1'     => $package['destination']['address_1'],
+			'address1'     => $address,
 			'address2'     => $package['destination']['address_2'],
 			'address3'     => null,
 			'phone'        => '',

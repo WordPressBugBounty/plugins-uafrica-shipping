@@ -236,43 +236,88 @@ class WooCommerce {
 	}
 
 	/**
-	 * Shipping methods description and estimated delivery dates
-	 *
+	 * Display shipping method description and estimated delivery dates for block checkout.
+	 */
+	public static function get_shipping_descriptions() {
+        try {
+            $descriptions              = array();
+            $uafrica_shipping_settings = get_option('woocommerce_uafrica_shipping_settings');
+
+            if ( ! empty($uafrica_shipping_settings['Additional_rate_info']) && $uafrica_shipping_settings['Additional_rate_info'] === 'yes') {
+                // Get shipping rates for the current package
+                $available_shipping_methods = WC()->session->get('shipping_for_package_0')['rates'];
+
+                foreach ($available_shipping_methods as $rate_id => $rate) {
+                    $meta_data = self::get_shipping_metadata($rate);
+
+                    $deliveryTimeFrame = self::calculate_delivery_timeframe($meta_data);
+                    $description       = ! empty($meta_data['method_description']) ? $meta_data['method_description'] : '';
+
+                    // Construct the description output
+                    $descriptions[$rate_id] = self::format_description_output($deliveryTimeFrame, $description);
+                }
+            }
+
+            return $descriptions;
+
+        } catch ( Exception $e ) {
+            if ( WP_DEBUG ) {
+                error_log( 'Failed to set shipping descriptions: ' . $e->getMessage() );
+            }
+        }
+	}
+
+	/**
+	 * Display shipping method description and estimated delivery dates for classic checkout.
 	 */
 	public static function shipping_methods_description( $method ): void {
-		$meta_data                 = $method->get_meta_data();
 		$uafrica_shipping_settings = get_option( 'woocommerce_uafrica_shipping_settings' );
+
 		if ( ! empty( $uafrica_shipping_settings['Additional_rate_info'] ) && $uafrica_shipping_settings['Additional_rate_info'] === 'yes' ) {
+			$meta_data = self::get_shipping_metadata( $method );
 
-			$deliveryTimeFrame = "";
-			if ( ! empty( $meta_data['min_delivery_date'] ) && ! empty( $meta_data['max_delivery_date'] ) ) {
-				$min_work_days = self::getWorkingDays( date( 'Y-m-d' ), $meta_data['min_delivery_date'] );
-				$max_work_days = self::getWorkingDays( date( 'Y-m-d' ), $meta_data['max_delivery_date'] );
+			$deliveryTimeFrame = self::calculate_delivery_timeframe( $meta_data );
+			$description = ! empty( $meta_data['method_description'] ) ? $meta_data['method_description'] : '';
 
-				if ( $min_work_days != $max_work_days ) {
-					$deliveryTimeFrame = $min_work_days . ' to ' . $max_work_days . ' business days<br>';
-				} else {
-					//don't display range if $min_work_days and $max_work_days are equal
-					$deliveryTimeFrame = $min_work_days . ' business days<br>';
-					//don't use plural form if its 1 day
-					if ( $min_work_days == 1 ) {
-						$deliveryTimeFrame = $min_work_days . ' business day<br>';
-					}
-				}
-			}
-
-			$description = "";
-			if ( ! empty( $meta_data['method_description'] ) ) {
-				$description = $meta_data['method_description'];
-			}
-
-			if ( ! empty( $deliveryTimeFrame ) || ! empty( $description ) ) {
-				echo "<div style='font-size: 0.8rem; padding-bottom:10px; font-weight: normal;'>" .
-				     $deliveryTimeFrame .
-				     $description .
-				     "</div>";
-			}
+			// Output the formatted description
+			echo self::format_description_output( $deliveryTimeFrame, $description );
 		}
+	}
+
+	/**
+	 * Helper function to retrieve metadata for a shipping method.
+	 */
+	protected static function get_shipping_metadata( $method ) {
+		return $method->get_meta_data();
+	}
+
+	/**
+	 * Helper function to calculate the delivery time frame based on min and max delivery dates.
+	 */
+	protected static function calculate_delivery_timeframe( $meta_data ) {
+		$deliveryTimeFrame = "";
+		$min_delivery_date = ! empty( $meta_data['min_delivery_date'] ) ? $meta_data['min_delivery_date'] : '';
+		$max_delivery_date = ! empty( $meta_data['max_delivery_date'] ) ? $meta_data['max_delivery_date'] : '';
+
+		if ( ! empty( $min_delivery_date ) && ! empty( $max_delivery_date ) ) {
+			$min_work_days = self::getWorkingDays( date( 'Y-m-d' ), $min_delivery_date );
+			$max_work_days = self::getWorkingDays( date( 'Y-m-d' ), $max_delivery_date );
+
+			$deliveryTimeFrame = ($min_work_days != $max_work_days)
+				? $min_work_days . ' to ' . $max_work_days . ' business days'
+				: $min_work_days . ' business day' . ($min_work_days > 1 ? 's' : '');
+		}
+
+		return $deliveryTimeFrame;
+	}
+
+	/**
+	 * Helper function to format the shipping description output.
+	 */
+
+	protected static function format_description_output( $deliveryTimeFrame, $description ) {
+		return "<div class='custom-shipping-description' style='font-size: 0.8rem; padding-top: 5px; padding-bottom:10px; font-weight: normal;'>" .
+			$deliveryTimeFrame . "<br>" . $description . "</div>";
 	}
 
 	/**
@@ -347,7 +392,7 @@ class WooCommerce {
 			'label'       => __('Suburb', 'woocommerce'),
 			'placeholder' => __('Enter your suburb', 'woocommerce'),
 			'required'    => false,
-			'class'       => array('form-row-wide'),
+            'class'       => array ('form-row-wide', 'address-field' ),
 			'priority'    => 65,
 		];
 
@@ -359,7 +404,7 @@ class WooCommerce {
 			'label'       => __('Suburb', 'woocommerce'),
 			'placeholder' => __('Enter your suburb', 'woocommerce'),
 			'required'    => false,
-			'class'       => array('form-row-wide'),
+			'class'       => array ('form-row-wide', 'address-field' ),
 			'priority'    => 65,
 		];
 
@@ -376,7 +421,7 @@ class WooCommerce {
 		try {
 			// If the setting is off, unset the session values
 			if ( ! self::has_suburb_at_checkout() ) {
-				if ( WC()->session ) {
+                if ( WC()->session ) {
 					WC()->session->__unset( 'shipping_suburb' );
 					WC()->session->__unset( 'cb_shipping_suburb' );
 					WC()->session->__unset( 'is_checkout_blocks' );
@@ -402,11 +447,27 @@ class WooCommerce {
 						$hasSuburb = true;
 					}
 				} else {
-					// Use the billing suburb
-					if ( isset( $output['billing_suburb'] ) ) {
-						$suburb = sanitize_text_field( $output['billing_suburb'] );
-						$hasSuburb = true;
-					}
+                    $setting = get_option( 'woocommerce_ship_to_destination' );
+                    if ( $setting ) {
+                        switch ($setting) {
+                            case 'shipping':
+                                if (isset($output['shipping_suburb'])) {
+                                    $suburb    = sanitize_text_field($output['shipping_suburb']);
+                                    $hasSuburb = true;
+                                }
+                                break;
+                            case 'billing_only':
+                            case 'billing':
+                                if (isset($output['billing_suburb'])) {
+                                    $suburb    = sanitize_text_field($output['billing_suburb']);
+                                    $hasSuburb = true;
+                                }
+                                break;
+                            default:
+                                break;
+
+                        }
+                    }
 				}
 
 				// Save the shipping suburb to session
@@ -473,28 +534,31 @@ class WooCommerce {
 				if ( self::has_suburb_at_checkout() ) {
 					if ( $is_checkout_blocks ) {
 						if ( ! is_cart() ) {
-							if ( WC()->customer ) {
-								$packages[$index]['destination']['cb_shipping_suburb'] = WC()->customer->get_meta( 'cb_shipping_suburb' );
-							} else if ( WC()->session ) {
-								$packages[$index]['destination']['cb_shipping_suburb'] = WC()->session->get( 'cb_shipping_suburb' );
-							}
+
+                            if ( WC()->customer &&
+                                 class_exists( '\Automattic\WooCommerce\Blocks\Package' ) &&
+                                 class_exists( '\Automattic\WooCommerce\Blocks\Domain\Services\CheckoutFields' ) ) {
+                                $field_id                  = 'namespace/cb_shipping_suburb';
+                                $customer                  = WC()->customer;
+                                $checkout_fields           = \Automattic\WooCommerce\Blocks\Package::container()->get(\Automattic\WooCommerce\Blocks\Domain\Services\CheckoutFields::class);
+                                $suburb_value = $checkout_fields->get_field_from_object($field_id, $customer, 'shipping');
+                                $packages[$index]['destination']['cb_shipping_suburb'] = $suburb_value;
+                            } else {
+                                if (WC()->customer) {
+                                    $packages[$index]['destination']['cb_shipping_suburb'] = WC()->customer->get_meta('cb_shipping_suburb');
+                                } elseif (WC()->session) {
+                                    $packages[$index]['destination']['cb_shipping_suburb'] = WC()->session->get('cb_shipping_suburb');
+                                }
+                            }
+
 							$packages[$index]['destination']['is_checkout_blocks'] = 'true';
 						}
-					} elseif ( is_checkout() ) {
-						// Only use POST data if it's available, else fallback to session data
-
-						// First check in POST data
-						if ( isset( $_POST['shipping_suburb'] ) ) {
-							$packages[$index]['destination']['shipping_suburb'] = sanitize_text_field( $_POST['shipping_suburb'] );
-						} elseif ( isset( $_POST['billing_suburb'] ) ) {
-							$packages[$index]['destination']['shipping_suburb'] = sanitize_text_field( $_POST['billing_suburb'] );
-						} elseif ( WC()->session ) {
-							// Fallback to session data if POST is not available
+					} elseif ( is_checkout() && ! is_wc_endpoint_url() ) {
+						if ( WC()->session ) {
 							$packages[$index]['destination']['shipping_suburb'] = WC()->session->get( 'shipping_suburb' );
 						}
 					}
 				}
-
 
 				// Add product shipping class to the items
 				$cart_items = $packages[$index]['contents'];
@@ -526,10 +590,17 @@ class WooCommerce {
 	 */
 	public static function register_checkout_field() {
 		try {
+			// Check if WooCommerce version is 8.0.0 or higher
+			if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '8.0.0', '<' ) ) {
+				return;
+			}
+
+			// Proceed if the suburb field is required at checkout
 			if ( ! self::has_suburb_at_checkout() ) {
 				return;
 			}
 
+			// Register the additional checkout field
 			woocommerce_register_additional_checkout_field(
 				array(
 					'id'            => 'namespace/cb_shipping_suburb',
@@ -538,8 +609,8 @@ class WooCommerce {
 					'location'      => 'address',
 					'required'      => false, // Optional field
 					'attributes'    => array(
-						'autocomplete'     => 'suburb',
-						'title'            => 'Suburb',
+						'autocomplete' => 'suburb',
+						'title'        => 'Suburb',
 					),
 				)
 			);
@@ -599,4 +670,12 @@ class WooCommerce {
 			}
 		}
 	}
+
+//    private static function bobgo_log($message)
+//    {
+//        if ( function_exists( 'wc_get_logger' ) ) {
+//            $logger  = wc_get_logger();
+//            $logger->debug( $message );
+//        }
+//    }
 }

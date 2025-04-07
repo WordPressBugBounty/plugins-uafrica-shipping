@@ -3,9 +3,9 @@
 Contributors: bobgroup, janwoostendorp
 Tags: courier, shipping, e-commerce, ecommerce, shipping rates, rates at checkout, woocommerce, delivery, parcel delivery, logistics, checkout shipping, order fulfillment
 Requires at least: 5.0
-Tested up to: 6.4
+Tested up to: 6.6
 Requires PHP: 7.0.0
-Stable tag: 3.0.3
+Stable tag: 3.0.71
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -43,12 +43,11 @@ __Rates at checkout__ is a Bob Go service that allows accounts to set up shippin
 2. Image of the dashboard page stats on the Bob Go app
 3. Image of the orders page on the Bob Go app
 4. Image of the shipment page on the Bob Go app
-5. Image of adding a sales channel on the Bob Go app
-6. Image of the rates at checkout setup on the Bob Go app
-7. Image of shipping page settings to set up packages on the Bob Go app
-8. Image of the rule engine page on the Bob Go app
-9. Image of the resource hub page on the Bob Go app
-10. Image of Bob Go rates at checkout on a Woocommerce store
+5. Image of the address book page on the Bob Go app
+6. Image of adding a sales channel on the Bob Go app
+7. Image of adding a Woocommerce sales channel on the Bob Go app
+8. Image of the rates at checkout setup on the Bob Go app
+9. Image of shipping page settings to set up packages on the Bob Go app
 
 == Installation ==
 
@@ -77,6 +76,12 @@ You must use your admin site URL to integrate your WooCommerce store to the Bob 
 [Contact us](https://www.bobgo.co.za/contact)
 
 == Changelog ==
+
+= 3.0.71 =
+* Fix shipping package to be compatible with the Dokan plugin
+* Improve shipping method descriptions for checkout blocks
+* Updated tracking page
+* Fix handling of the custom shipping suburb during checkout
 
 = 3.0.3 =
 * Update the plugin listing content

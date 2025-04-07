@@ -83,38 +83,48 @@ class Activation {
 	 * Create a page and set the shortcode or add the gutenbergblock.
 	 */
 	public static function create_page() {
-		$option = get_option( 'uafrica' );
-		
-		// Check if the 'shipping_page' option exists and is a valid page ID.
+		$option = get_option('uafrica');
+
+		// Check if the 'shipping_page' option exists and the page ID is valid
 		if ( ! empty( $option['shipping_page'] ) && get_post_status( $option['shipping_page'] ) ) {
-			// There already appears to be an older shipping page from a previous activation.
-			// No need to create a new shipping page.
+
 			$option['activate_message']  = __( 'A shipping page was already found from a previous activation.', 'uafrica-shipping' ) . PHP_EOL;
 			$option['activate_message'] .= __( 'You can change this page in the settings.', 'uafrica-shipping' );
 			update_option( 'uafrica', $option );
-			
+
 			return;
 		}
-		
-		// Determine content based on editor type.
-		if ( ! use_block_editor_for_post_type( 'page' ) ) {
-			$content = '[uafrica bg_color="#000000" text_color="#ffffff"]';
-		} else {
-			$content = '<!-- wp:uafrica/shipping /-->';
+
+		$existing_page = get_page_by_title( 'Shipping details', OBJECT, 'page' );
+
+		if ( $existing_page ) {
+			$option['shipping_page'] = $existing_page->ID;
+			$option['activate_message']  = __( 'Found an existing shipping page.', 'uafrica-shipping' ) . PHP_EOL;
+			$option['activate_message'] .= __( 'You can change this page in the settings.', 'uafrica-shipping' );
+			update_option( 'uafrica', $option );
+
+			return;
 		}
-		
-		$arr = [];
-		$arr['post_title'] = __( 'Shipping details', 'uafrica-shipping' );
-		$arr['post_content'] = $content;
-		$arr['post_type'] = 'page';
-		$arr['post_status'] = 'publish';
-		
-		$option['shipping_page']     = wp_insert_post( $arr );
+
+		// Create content based on editor type
+		$content = ! use_block_editor_for_post_type( 'page' )
+			? '[uafrica bg_color="#000000" text_color="#ffffff"]'
+			: '<!-- wp:uafrica/shipping /-->';
+
+		$arr = [
+			'post_title'   => __( 'Shipping details', 'uafrica-shipping' ),
+			'post_content' => $content,
+			'post_type'    => 'page',
+			'post_status'  => 'publish',
+		];
+
+		$new_page_id = wp_insert_post( $arr );
+		$option['shipping_page'] = $new_page_id;
 		$option['activate_message']  = __( 'Created a new shipping page.', 'uafrica-shipping' ) . PHP_EOL;
 		$option['activate_message'] .= __( 'You can change this page in the settings.', 'uafrica-shipping' );
+
 		update_option( 'uafrica', $option );
 	}
-	
 
 	/**
 	 * Enable suburb fields at checkout by default.
