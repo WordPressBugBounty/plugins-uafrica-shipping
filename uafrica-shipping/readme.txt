@@ -3,9 +3,9 @@
 Contributors: bobgroup, janwoostendorp
 Tags: courier, shipping, e-commerce, ecommerce, shipping rates, rates at checkout, woocommerce, delivery, parcel delivery, logistics, checkout shipping, order fulfillment
 Requires at least: 5.0
-Tested up to: 6.6
+Tested up to: 6.7
 Requires PHP: 7.0.0
-Stable tag: 3.0.71
+Stable tag: 3.0.72
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -76,6 +76,9 @@ You must use your admin site URL to integrate your WooCommerce store to the Bob 
 [Contact us](https://www.bobgo.co.za/contact)
 
 == Changelog ==
+
+= 3.0.72 =
+* Declare support for WordPress version 6.7
 
 = 3.0.71 =
 * Fix shipping package to be compatible with the Dokan plugin
