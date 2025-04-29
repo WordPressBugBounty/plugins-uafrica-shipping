@@ -244,18 +244,23 @@ class WooCommerce {
             $uafrica_shipping_settings = get_option('woocommerce_uafrica_shipping_settings');
 
             if ( ! empty($uafrica_shipping_settings['Additional_rate_info']) && $uafrica_shipping_settings['Additional_rate_info'] === 'yes') {
-                // Get shipping rates for the current package
-                $available_shipping_methods = WC()->session->get('shipping_for_package_0')['rates'];
+				// Get shipping package information from the session
+				$shipping_package = WC()->session->get('shipping_for_package_0');
 
-                foreach ($available_shipping_methods as $rate_id => $rate) {
-                    $meta_data = self::get_shipping_metadata($rate);
+				// Check if the shipping package and rates exist before accessing
+				if ( isset($shipping_package['rates']) && is_array($shipping_package['rates']) ) {
+					$available_shipping_methods = $shipping_package['rates'];
 
-                    $deliveryTimeFrame = self::calculate_delivery_timeframe($meta_data);
-                    $description       = ! empty($meta_data['method_description']) ? $meta_data['method_description'] : '';
+					foreach ($available_shipping_methods as $rate_id => $rate) {
+						$meta_data = self::get_shipping_metadata($rate);
 
-                    // Construct the description output
-                    $descriptions[$rate_id] = self::format_description_output($deliveryTimeFrame, $description);
-                }
+						$deliveryTimeFrame = self::calculate_delivery_timeframe($meta_data);
+						$description = !empty($meta_data['method_description']) ? $meta_data['method_description'] : '';
+
+						// Construct the description output
+						$descriptions[$rate_id] = self::format_description_output($deliveryTimeFrame, $description);
+					}
+				}
             }
 
             return $descriptions;

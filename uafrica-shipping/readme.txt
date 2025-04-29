@@ -5,7 +5,7 @@ Tags: courier, shipping, e-commerce, ecommerce, shipping rates, rates at checkou
 Requires at least: 5.0
 Tested up to: 6.7
 Requires PHP: 7.0.0
-Stable tag: 3.0.72
+Stable tag: 3.0.81
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -76,6 +76,9 @@ You must use your admin site URL to integrate your WooCommerce store to the Bob 
 [Contact us](https://www.bobgo.co.za/contact)
 
 == Changelog ==
+
+= 3.0.81 =
+* Fix handling rates in the shipping package
 
 = 3.0.72 =
 * Declare support for WordPress version 6.7

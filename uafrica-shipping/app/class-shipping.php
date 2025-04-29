@@ -56,7 +56,7 @@ class Shipping extends \WC_Shipping_Method {
 				'default'     => 'no',
 			),
 			'hide'          => array(
-				'title'       => __( 'Hide WooCommerce Shipping Rates', 'uafrica-shipping' ),
+				'title'       => __( 'Hide WooCommerce shipping rates', 'uafrica-shipping' ),
 				'type'        => 'checkbox',
 				'description' => __( 'Hide other WooCommerce shipping rates if Bob Go returns rates.', 'uafrica-shipping' ),
 				'default'     => 'yes',
