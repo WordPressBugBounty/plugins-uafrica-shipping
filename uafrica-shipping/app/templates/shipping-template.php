@@ -119,6 +119,14 @@
 									<div class="bobgo-value">{{courier_name}}</div>
 								</div>
 							</div>
+							{{#showEstimatedDeliveryRange}}
+								<div class="shipping-details-row">
+									<div class="label-value-container">
+										<div class="bobgo-label">Estimated delivery</div>
+										<div class="bobgo-value">{{deliveryRange}}</div>
+									</div>
+								</div>
+							{{/showEstimatedDeliveryRange}}
 						</div>
 					</div>
 				</div>

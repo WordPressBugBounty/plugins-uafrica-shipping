@@ -12,7 +12,7 @@
  * Domain Path:       /languages
  * Requires at least: 5.0
  * Requires PHP:      7.0
- * Version:           3.0.81
+ * Version:           3.0.88
  * License:           GPLv2 or later
  *
  * @package Uafrica_Shipping
@@ -24,7 +24,7 @@ namespace uAfrica_Shipping;
  * Constants.
  */
 
-define( 'UAFRICA_SHIPPING_VERSION', '3.0.81' );
+define( 'UAFRICA_SHIPPING_VERSION', '3.0.88' );
 // Endpoints for tracking orders.
 define( 'UAFRICA_SHIPPING_API_TRACKING_V3', 'https://api.bobgo.co.za/tracking?channel=DOMAIN&tracking_reference=NUMBER' );
 // Endpoints for shipping methods and rates.
