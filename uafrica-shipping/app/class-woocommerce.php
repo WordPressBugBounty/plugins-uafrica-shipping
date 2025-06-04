@@ -23,6 +23,11 @@ class WooCommerce {
 			return;
 		}
 
+        // Skip if it's a subscription or a renewal
+        if (self::is_subscription_order($order)) {
+            return;
+        }
+
 		// To prevent infinite loops, we need to remove the action and add it again after saving the order meta
 		remove_action('woocommerce_update_order', [ '\uAfrica_Shipping\app\WooCommerce', 'save_order_meta' ], 10);
 
@@ -40,6 +45,7 @@ class WooCommerce {
 
 		// Save the order meta
 		$order->save();
+
 		// We need to add the action again after saving the order meta
 		add_action( 'woocommerce_update_order', [ '\uAfrica_Shipping\app\WooCommerce', 'save_order_meta' ], 10, 2 );
 	}
@@ -60,7 +66,13 @@ class WooCommerce {
 		// Get order if not sent along to hook (Happens when hook fires too fast)
 		$order = is_a( $order, 'WC_Order' ) ? $order : wc_get_order( $order_id );
 
-		// Total grams
+
+        // Skip if it's a subscription or a renewal
+        if (self::is_subscription_order($order)) {
+            return;
+        }
+
+        // Total grams
 		self::include_total_grams_in_order($order_id, $order);
 
 		// Save meta
@@ -83,7 +95,11 @@ class WooCommerce {
 		}
 
 		$weight = 0;
-		$cart   = WC()->cart;
+        $cart = null;
+        if ( WC()->cart ) {
+            $cart = WC()->cart;
+        }
+
 		if ( $cart !== null ) {
 			// Grab total weight from cart.
 			$weight = $cart->get_cart_contents_weight();
@@ -676,11 +692,37 @@ class WooCommerce {
 		}
 	}
 
-//    private static function bobgo_log($message)
-//    {
-//        if ( function_exists( 'wc_get_logger' ) ) {
-//            $logger  = wc_get_logger();
-//            $logger->debug( $message );
-//        }
-//    }
+    private static function bobgo_log($message)
+    {
+        if ( function_exists( 'wc_get_logger' ) ) {
+            $logger  = wc_get_logger();
+            $logger->debug( $message );
+        }
+    }
+
+    /**
+     * Checks whether an order is a subscription order.
+     *
+     * @param WC_Customer|WC_Order $order The order
+     * @param int $order_id The order ID.
+     *
+     * @return bool
+     *
+     **/
+    private static function is_subscription_order($order)
+    {
+        if ( empty( $order ) || $order === false ) {
+            return false;
+        }
+
+        // Return true if it's a subscription or a renewal
+        if ( method_exists( $order, 'get_type' ) && $order->get_type() === 'shop_subscription' ) {
+            return true;
+        }
+        if ( $order->get_meta( '_subscription_renewal', true ) ) {
+            return true;
+        }
+
+        return false;
+    }
 }
