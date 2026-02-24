@@ -1,3 +1,4 @@
+<?php if ( ! defined( 'ABSPATH' ) ) { exit; } ?>
 <div id="tracking-container" class="bobgo-tracking">
 	<!-- Search form for tracking number -->
 	<div id="mc-search-container" class="mc-hidden bobgo-card">

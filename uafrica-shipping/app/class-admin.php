@@ -2,6 +2,10 @@
 
 namespace uAfrica_Shipping\app;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Class Settings
  *
@@ -55,7 +59,7 @@ class Admin {
 
 		add_settings_field(
 			'uafrica_suburb_at_checkout',
-			'Show suburb field at checkout',
+			__( 'Show suburb field at checkout', 'uafrica-shipping' ),
 			[ self::class, 'render_suburb_checkbox' ],
 			'uafrica-shipping',
 			'page-section'
@@ -66,20 +70,20 @@ class Admin {
 	 * Render the suburb_at_checkout checkbox.
 	 */
 	public static function render_suburb_checkbox() {
-		$option = get_option( 'uafrica' );
+		$option = get_option( 'uafrica', [] );
 
 		$current_val = $option['suburb_at_checkout'] ?? 1;
 
 		$checked = checked( 1, $current_val, false );
 		$html    = '<input type="checkbox" name="uafrica[suburb_at_checkout]" value="1" id="suburb_checkbox" ' . $checked . '/>';
-		echo $html;
+		echo wp_kses( $html, array( 'input' => array( 'type' => true, 'name' => true, 'value' => true, 'id' => true, 'checked' => true ) ) );
 	}
 
 	/**
 	 * Render the shipping page setting.
 	 */
 	public static function render_shippings_page() {
-		$option      = get_option( 'uafrica' );
+		$option      = get_option( 'uafrica', [] );
 		$current_val = 0;
 		if ( ! empty( $option['shipping_page'] ) ) {
 			$current_val = $option['shipping_page'];
@@ -105,21 +109,29 @@ class Admin {
 	 *
 	 * @return array
 	 */
-	public static function sanitize_settings( array $settings ): array {
-		if ( ! empty( $settings['shipping_page'] ) ) {
-			$possible_page = get_post( $settings['shipping_page'] );
-			if ( is_null( $possible_page ) || 'page' !== $possible_page->post_type ) {
-				$settings['shipping_page'] = 0;
-			} else {
-				$settings['shipping_page'] = (int) $possible_page->ID; // Cast to integer.
-			}
-		} // ifend; save shipping_page.
-
-		if ( ! isset( $settings['suburb_at_checkout'] ) ) {
-			$settings['suburb_at_checkout'] = 0;
+	public static function sanitize_settings( $settings ): array {
+		if ( ! is_array( $settings ) ) {
+			return array();
 		}
 
-		return $settings;
+		$sanitized = array();
+
+		// Validate shipping_page.
+		if ( ! empty( $settings['shipping_page'] ) ) {
+			$possible_page = get_post( absint( $settings['shipping_page'] ) );
+			if ( is_null( $possible_page ) || 'page' !== $possible_page->post_type ) {
+				$sanitized['shipping_page'] = 0;
+			} else {
+				$sanitized['shipping_page'] = (int) $possible_page->ID;
+			}
+		} else {
+			$sanitized['shipping_page'] = 0;
+		}
+
+		// Cast suburb_at_checkout to 0 or 1 (checkbox).
+		$sanitized['suburb_at_checkout'] = ! empty( $settings['suburb_at_checkout'] ) ? 1 : 0;
+
+		return $sanitized;
 	}
 
 	/**
@@ -134,13 +146,13 @@ class Admin {
 		if ( function_exists( '\WC' ) ) {
 			// @see \uAfrica_Shipping\app\Shipping::$id hardcoded uafrica_shipping phpcs:ignore Squiz.PHP.CommentedOutCode.Found
 			$href          = admin_url( 'admin.php?page=wc-settings&tab=shipping&section=uafrica_shipping' );
-			$settings_link = '<a href="' . $href . '">' . __( 'Shipping' ) . '</a>'; // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
+			$settings_link = '<a href="' . esc_url( $href ) . '">' . esc_html__( 'Shipping', 'uafrica-shipping' ) . '</a>';
 			array_unshift( $links, $settings_link );
 		}
 
 		// General settings.
 		$href          = admin_url( 'options-general.php?page=uafrica-shipping' );
-		$settings_link = '<a href="' . $href . '">' . __( 'Settings' ) . '</a>'; // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
+		$settings_link = '<a href="' . esc_url( $href ) . '">' . esc_html__( 'Settings', 'uafrica-shipping' ) . '</a>';
 		array_unshift( $links, $settings_link );
 
 		return $links;
@@ -155,7 +167,7 @@ class Admin {
 	 * @return array
 	 */
 	public static function label_page_as_shipping( array $post_states, \WP_Post $post = null ): array {
-		$option = get_option( 'uafrica' );
+		$option = get_option( 'uafrica', [] );
 		if ( ! empty( $post->ID ) && ! empty( $option['shipping_page'] ) && $post->ID === $option['shipping_page'] ) {
 			$post_states['uafrica_shipping_page'] = __( 'Bob Go page', 'uafrica-shipping' );
 		}
@@ -187,7 +199,7 @@ class Admin {
 			return; // not the uAfrica column, no continue.
 		}
 
-		$option = get_option( 'uafrica' );
+		$option = get_option( 'uafrica', [] );
 		if ( empty( $option['shipping_page'] ) ) {
 			return; // no shipping page set, no continue.
 		}
@@ -208,8 +220,7 @@ class Admin {
 			$full_link = add_query_arg( array( 'order-number' => $order_number ), $page_link );
 		}
 
-		//phpcs:ignore  WordPress.Security.EscapeOutput.OutputNotEscaped
-		echo "<a href='{$full_link}'>" . _x( 'Track order', 'link in woo admin', 'uafrica-shipping' ) . '</a>';
+		echo '<a href="' . esc_url( $full_link ) . '">' . esc_html_x( 'Track order', 'link in woo admin', 'uafrica-shipping' ) . '</a>';
 	}
 
 	/**

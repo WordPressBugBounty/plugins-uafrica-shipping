@@ -2,6 +2,10 @@
 
 namespace uAfrica_Shipping\app;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Class Block Handles the Gutenberg and Elementor blocks/widgets.
  *

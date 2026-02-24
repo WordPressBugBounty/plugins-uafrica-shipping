@@ -2,6 +2,10 @@
 
 namespace uAfrica_Shipping\app;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 class WooCommerce {
 
 	/**
@@ -239,7 +243,7 @@ class WooCommerce {
 		while ( $begin <= $end ) {
 			// number of days in the given interval
 			$no_days ++;
-			$what_day = date( "N", $begin );
+			$what_day = gmdate( "N", $begin );
 			// 6 and 7 are weekend days
 			if ( $what_day > 5 ) {
 				$weekends ++;
@@ -282,9 +286,7 @@ class WooCommerce {
             return $descriptions;
 
         } catch ( Exception $e ) {
-            if ( WP_DEBUG ) {
-                error_log( 'Failed to set shipping descriptions: ' . $e->getMessage() );
-            }
+            self::bobgo_log( 'Failed to set shipping descriptions: ' . $e->getMessage() );
         }
 	}
 
@@ -301,7 +303,7 @@ class WooCommerce {
 			$description = ! empty( $meta_data['method_description'] ) ? $meta_data['method_description'] : '';
 
 			// Output the formatted description
-			echo self::format_description_output( $deliveryTimeFrame, $description );
+			echo wp_kses_post( self::format_description_output( $deliveryTimeFrame, $description ) );
 		}
 	}
 
@@ -321,8 +323,8 @@ class WooCommerce {
 		$max_delivery_date = ! empty( $meta_data['max_delivery_date'] ) ? $meta_data['max_delivery_date'] : '';
 
 		if ( ! empty( $min_delivery_date ) && ! empty( $max_delivery_date ) ) {
-			$min_work_days = self::getWorkingDays( date( 'Y-m-d' ), $min_delivery_date );
-			$max_work_days = self::getWorkingDays( date( 'Y-m-d' ), $max_delivery_date );
+			$min_work_days = self::getWorkingDays( gmdate( 'Y-m-d' ), $min_delivery_date );
+			$max_work_days = self::getWorkingDays( gmdate( 'Y-m-d' ), $max_delivery_date );
 
 			$deliveryTimeFrame = ($min_work_days != $max_work_days)
 				? $min_work_days . ' to ' . $max_work_days . ' business days'
@@ -337,8 +339,8 @@ class WooCommerce {
 	 */
 
 	protected static function format_description_output( $deliveryTimeFrame, $description ) {
-		return "<div class='custom-shipping-description' style='font-size: 0.8rem; padding-top: 5px; padding-bottom:10px; font-weight: normal;'>" .
-			$deliveryTimeFrame . "<br>" . $description . "</div>";
+		return "<div class='custom-shipping-description' style='font-size: 0.8rem; padding-top: 5px; padding-bottom:10px; font-weight: normal;'>"
+			. esc_html( $deliveryTimeFrame ) . '<br>' . wp_kses_post( $description ) . '</div>';
 	}
 
 	/**
@@ -347,7 +349,7 @@ class WooCommerce {
 	 * @return bool
 	 */
 	private static function has_suburb_at_checkout(): bool {
-		$options            = get_option( 'uafrica' );
+		$options            = get_option( 'uafrica', [] );
 		$suburb_at_checkout = $options['suburb_at_checkout'] ?? 1;
 
 		return (bool) $suburb_at_checkout;
@@ -410,8 +412,8 @@ class WooCommerce {
 			'id'          => 'shipping_suburb',
 			'name'        => 'shipping_suburb',
 			'type'        => 'text',
-			'label'       => __('Suburb', 'woocommerce'),
-			'placeholder' => __('Enter your suburb', 'woocommerce'),
+			'label'       => __('Suburb', 'uafrica-shipping'),
+			'placeholder' => __('Enter your suburb', 'uafrica-shipping'),
 			'required'    => false,
             'class'       => array ('form-row-wide', 'address-field' ),
 			'priority'    => 65,
@@ -422,8 +424,8 @@ class WooCommerce {
 			'id'          => 'billing_suburb',
 			'name'        => 'billing_suburb',
 			'type'        => 'text',
-			'label'       => __('Suburb', 'woocommerce'),
-			'placeholder' => __('Enter your suburb', 'woocommerce'),
+			'label'       => __('Suburb', 'uafrica-shipping'),
+			'placeholder' => __('Enter your suburb', 'uafrica-shipping'),
 			'required'    => false,
 			'class'       => array ('form-row-wide', 'address-field' ),
 			'priority'    => 65,
@@ -499,9 +501,7 @@ class WooCommerce {
 				}
 			}
 		} catch ( Exception $e ) {
-			if ( WP_DEBUG ) {
-				error_log( 'Failed to save suburb in session during order review: ' . $e->getMessage() );
-			}
+			self::bobgo_log( 'Failed to save suburb in session during order review: ' . $e->getMessage() );
 		}
 	}
 
@@ -597,9 +597,7 @@ class WooCommerce {
 			}
 
 		} catch ( Exception $e ) {
-			if ( WP_DEBUG ) {
-				error_log( 'Failed to determine if checkout blocks are being used: ' . $e->getMessage() );
-			}
+			self::bobgo_log( 'Failed to determine if checkout blocks are being used: ' . $e->getMessage() );
 		}
 
 		return $packages;
@@ -636,9 +634,7 @@ class WooCommerce {
 				)
 			);
 		} catch ( Exception $e ) {
-			if ( WP_DEBUG ) {
-				error_log( 'Failed to add suburb field for checkout blocks: ' . $e->getMessage() );
-			}
+			self::bobgo_log( 'Failed to add suburb field for checkout blocks: ' . $e->getMessage() );
 		}
 	}
 
@@ -686,9 +682,7 @@ class WooCommerce {
 				WC()->session->set( 'cb_shipping_suburb', $value );
 			}
 		} catch ( Exception $e ) {
-			if ( WP_DEBUG ) {
-				error_log( 'Failed to set additional field value: ' . $e->getMessage() );
-			}
+			self::bobgo_log( 'Failed to set additional field value: ' . $e->getMessage() );
 		}
 	}
 

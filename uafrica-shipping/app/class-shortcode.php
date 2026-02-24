@@ -2,6 +2,10 @@
 
 namespace uAfrica_Shipping\app;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Class Shortcode
  *
@@ -18,15 +22,9 @@ class Shortcode {
 	 * Register the style and scripts of the shortcode.
 	 */
 	public static function styles_scripts() {
-		wp_enqueue_script('mustache', 'https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.3.2/mustache.min.js', array(), null, true);
+		wp_enqueue_script( 'mustache', UAFRICA_SHIPPING_URL . 'assets/vendor/mustache.min.js', array(), '2.3.2', true );
 
-        wp_enqueue_script(
-            'moment-js',
-            'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js',
-            array(),
-            '2.29.1',
-            true
-        );
+		wp_enqueue_script( 'moment-js', UAFRICA_SHIPPING_URL . 'assets/vendor/moment.min.js', array(), '2.29.1', true );
 
 		wp_enqueue_script(
 			self::HANDLE,
@@ -71,17 +69,15 @@ class Shortcode {
             UAFRICA_SHIPPING_VERSION,
             true
         );
-        wp_localize_script( self::HANDLE_SHIPPING_DESCRIPTION, 'shippingDescriptionData', array(
+        wp_localize_script( self::HANDLE_SHIPPING_DESCRIPTION, 'uafrica_shipping_description_data', array(
             'shippingDescriptions' => \uAfrica_Shipping\app\WooCommerce::get_shipping_descriptions(),
         ));
-
-		wp_enqueue_script(self::HANDLE, get_template_directory_uri() . 'assets/build/uafrica-shipping.js', [], UAFRICA_SHIPPING_VERSION, true);
 
 		// Fetch content background from theme mod or customizer
 		$content_background = get_theme_mod('content_background', 'rgba(0, 0, 0, 0)');
 
 		// Pass data to your JavaScript
-		wp_localize_script(self::HANDLE, 'themeSettings', [
+		wp_localize_script(self::HANDLE, 'uafrica_theme_settings', [
 			'contentBackgroundColor' => $content_background,
 		]);
 	}

@@ -5,6 +5,9 @@
  * @package Uafrica_Shipping
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 ?>
 <div class="wrap">
 	<h1><?php esc_html_e( 'Bob Go settings', 'uafrica-shipping' ); ?></h1>

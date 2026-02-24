@@ -2,6 +2,10 @@
 
 namespace uAfrica_Shipping\app;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 if ( class_exists( '\Elementor\Widget_Base' ) ) {
 	class ElementorWidget extends \Elementor\Widget_Base {
 
@@ -37,7 +41,7 @@ if ( class_exists( '\Elementor\Widget_Base' ) ) {
 		 * @return void
 		 */
 		public function render() {
-			echo Shortcode::render();
+			echo wp_kses_post( Shortcode::render() );
 		}
 	}
 }

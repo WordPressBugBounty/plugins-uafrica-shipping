@@ -12,7 +12,7 @@
  * Domain Path:       /languages
  * Requires at least: 5.0
  * Requires PHP:      7.0
- * Version:           3.0.90
+ * Version:           3.0.102
  * License:           GPLv2 or later
  *
  * @package Uafrica_Shipping
@@ -20,11 +20,15 @@
 
 namespace uAfrica_Shipping;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Constants.
  */
 
-define( 'UAFRICA_SHIPPING_VERSION', '3.0.90' );
+define( 'UAFRICA_SHIPPING_VERSION', '3.0.102' );
 // Endpoints for tracking orders.
 define( 'UAFRICA_SHIPPING_API_TRACKING_V3', 'https://api.bobgo.co.za/tracking?channel=DOMAIN&tracking_reference=NUMBER' );
 // Endpoints for shipping methods and rates.
@@ -60,8 +64,7 @@ register_activation_hook( __FILE__, array( '\uAfrica_Shipping\app\Activation', '
 add_action( 'admin_notices', array( '\uAfrica_Shipping\app\Activation', 'notice' ) );
 add_action( 'wpmu_new_blog', array( '\uAfrica_Shipping\app\Activation', 'create_new_blog' ) );
 
-// Translations.
-add_action( 'init', function () { load_plugin_textdomain( 'uafrica-shipping', false, plugin_basename( UAFRICA_SHIPPING_DIR ) . '/languages/' ); } );
+// Translations are loaded automatically by WordPress for plugins hosted on WordPress.org.
 
 // Settings page.
 add_action( 'admin_menu', array( '\uAfrica_Shipping\app\Admin', 'register_menu_item' ) );

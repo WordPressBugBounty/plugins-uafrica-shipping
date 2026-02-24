@@ -1,11 +1,11 @@
 === Bob Go smart shipping solution for WooCommerce ===
 
 Contributors: bobgroup, janwoostendorp
-Tags: courier, shipping, e-commerce, ecommerce, shipping rates, rates at checkout, woocommerce, delivery, parcel delivery, logistics, checkout shipping, order fulfillment
+Tags: courier, shipping, shipping rates, woocommerce, fulfillment
 Requires at least: 5.0
-Tested up to: 6.7
-Requires PHP: 7.0.0
-Stable tag: 3.0.90
+Tested up to: 6.9
+Requires PHP: 7.0
+Stable tag: 3.0.102
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -49,6 +49,27 @@ __Rates at checkout__ is a Bob Go service that allows accounts to set up shippin
 8. Image of the rates at checkout setup on the Bob Go app
 9. Image of shipping page settings to set up packages on the Bob Go app
 
+== External services ==
+
+This plugin connects to the Bob Go API to retrieve shipping rates at checkout and
+order tracking information.
+
+**Bob Go Rates at Checkout API**
+When the "Rates at Checkout" feature is enabled, the plugin sends cart contents
+(items, weights, dimensions, origin and destination addresses) to the Bob Go API
+to retrieve applicable shipping rates.
+This service is provided by Bob Group (Pty) Ltd:
+- Terms of service: https://www.bobgo.co.za/terms-conditions
+- Privacy policy: https://www.bob.co.za/privacy-policy
+
+**Bob Go Order Tracking API**
+The plugin fetches shipment tracking information from the Bob Go API when a
+customer visits the tracking page.
+No personal data is sent; only the order tracking reference number is used.
+This service is provided by Bob Group (Pty) Ltd:
+- Terms of service: https://www.bobgo.co.za/terms-conditions
+- Privacy policy: https://www.bob.co.za/privacy-policy
+
 == Installation ==
 
 1. Log into your WordPress admin site.
@@ -76,6 +97,21 @@ You must use your admin site URL to integrate your WooCommerce store to the Bob 
 [Contact us](https://www.bobgo.co.za/contact)
 
 == Changelog ==
+
+= 3.0.102 =
+* Fix WordPress Plugin Directory compliance issues.
+
+= 3.0.96 =
+* Remove temporary Mustache testing fixes.
+
+= 3.0.95 =
+* Update the listing tags
+
+= 3.0.94 =
+* Change the default value of the "Hide WooCommerce shipping rates" setting to "No"
+
+= 3.0.93 =
+* Make sure Mustache executes before the HTML is inserted into the DOM.
 
 = 3.0.90 =
 * Fix handling order meta updates for WooCommerce Subscriptions

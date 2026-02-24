@@ -1,7 +1,10 @@
 <?php
 
-
 namespace uAfrica_Shipping\app;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * Class Activation
@@ -17,7 +20,7 @@ class Activation {
 		if ( 'plugins' !== get_current_screen()->id ) {
 			return; // only check this on the plugins page.
 		}
-		$option = get_option( 'uafrica' );
+		$option = get_option( 'uafrica', [] );
 		if ( empty( $option['activate_message'] ) ) {
 			return; // no message to display.
 		}
@@ -52,7 +55,9 @@ class Activation {
 			// Deactivate plugin in case of any error and show a meaningful error message
 			deactivate_plugins( plugin_basename( plugin_basename( UAFRICA_SHIPPING_DIR ) . '/uafrica-shipping.php' ) );
 			if ( is_admin() ) {
-				error_log('Plugin activation failed: ' . $e->getMessage() );
+				if ( function_exists( 'wc_get_logger' ) ) {
+				wc_get_logger()->debug( 'Plugin activation failed: ' . $e->getMessage(), array( 'source' => 'uafrica-shipping' ) );
+			}
 				add_action( 'admin_notices', function() {
 					?>
 					<div class="notice notice-error">
@@ -83,7 +88,7 @@ class Activation {
 	 * Create a page and set the shortcode or add the gutenbergblock.
 	 */
 	public static function create_page() {
-		$option = get_option('uafrica');
+		$option = get_option( 'uafrica', [] );
 
 		// Check if the 'shipping_page' option exists and the page ID is valid
 		if ( ! empty( $option['shipping_page'] ) && get_post_status( $option['shipping_page'] ) ) {
@@ -95,7 +100,14 @@ class Activation {
 			return;
 		}
 
-		$existing_page = get_page_by_title( 'Shipping details', OBJECT, 'page' );
+		$query = new \WP_Query( array(
+		'post_type'      => 'page',
+		'post_status'    => 'any',
+		'title'          => 'Shipping details',
+		'posts_per_page' => 1,
+		'no_found_rows'  => true,
+	) );
+	$existing_page = $query->have_posts() ? $query->posts[0] : null;
 
 		if ( $existing_page ) {
 			$option['shipping_page'] = $existing_page->ID;
@@ -130,7 +142,7 @@ class Activation {
 	 * Enable suburb fields at checkout by default.
 	 */
 	public static function enable_suburb_fields( $force = false ) {
-		$option = get_option( 'uafrica' );
+		$option = get_option( 'uafrica', [] );
 		if ( $force || ! isset( $option['suburb_at_checkout'] ) ) {
 			$option['suburb_at_checkout'] = 1;
 			update_option( 'uafrica', $option );

@@ -2,6 +2,10 @@
 
 namespace uAfrica_Shipping\app;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Class Shipping
  *
@@ -59,7 +63,7 @@ class Shipping extends \WC_Shipping_Method {
 				'title'       => __( 'Hide WooCommerce shipping rates', 'uafrica-shipping' ),
 				'type'        => 'checkbox',
 				'description' => __( 'Hide other WooCommerce shipping rates if Bob Go returns rates.', 'uafrica-shipping' ),
-				'default'     => 'yes',
+				'default'     => 'no',
 			),
 			'Test_API_Call' => array(
 				'title'       => __( 'Makes a test call to the Bob Go API', 'uafrica-shipping' ),
@@ -70,10 +74,12 @@ class Shipping extends \WC_Shipping_Method {
 			'Site_Address'          => array(
 				'title'       => __( 'Use Site Address (URL) when requesting rates', 'uafrica-shipping' ),
 				'type'        => 'checkbox',
-				'description' => __( 'When this setting is enabled <strong>' . wp_parse_url( home_url(), PHP_URL_HOST ) .
-					wp_parse_url( home_url(), PHP_URL_PATH ) .'</strong> will be used, instead of <strong>' . wp_parse_url( site_url(), PHP_URL_HOST ) .
-					'</strong>, when making requests for shipping rates.<br><span style="color:#d97426;">Only enable this option if your WooCommerce store is accessed via a subfolder,
-                     e.g. /shop.</span>', 'uafrica-shipping' ),
+				'description' => sprintf(
+					/* translators: 1: Site Address URL with path, 2: WordPress Address URL host */
+					__( 'When this setting is enabled <strong>%1$s</strong> will be used, instead of <strong>%2$s</strong>, when making requests for shipping rates.<br><span style="color:#d97426;">Only enable this option if your WooCommerce store is accessed via a subfolder, e.g. /shop.</span>', 'uafrica-shipping' ),
+					esc_html( wp_parse_url( home_url(), PHP_URL_HOST ) . wp_parse_url( home_url(), PHP_URL_PATH ) ),
+					esc_html( wp_parse_url( site_url(), PHP_URL_HOST ) )
+				),
 				'default'     => 'no',
 			),
 			'Additional_rate_info'  => array(
@@ -371,36 +377,38 @@ class Shipping extends \WC_Shipping_Method {
 	 */
 	protected function print_test_result( $response ) {
 		// Inspect the returned API data to see if rates are returned.
-        switch ($response){
-            case 200:
-                echo "<div style='font-size: 1rem; color: green; margin-top:10px; border: solid 1px green; padding: 15px 12px; border-radius: 10px;'> ";
-                echo '&check; Rates at checkout connected';
-                echo '</div>';
-                break;
+		$allowed_html = array(
+			'div' => array( 'style' => true ),
+			'a'   => array( 'href' => true, 'target' => true ),
+		);
+		switch ( $response ) {
+			case 200:
+				echo wp_kses(
+					"<div style='font-size: 1rem; color: green; margin-top:10px; border: solid 1px green; padding: 15px 12px; border-radius: 10px;'>✓ Rates at checkout connected</div>",
+					$allowed_html
+				);
+				break;
 
-            case 404:
-                echo "<div style='font-size: 1rem; color: red; margin-top:10px; border: solid 1px red; padding: 15px 12px; border-radius: 10px;'> ";
-                echo '&#10060; Your WooCommerce channel is not installed on Bob Go. Please visit ';
-                echo '<a href="https://my.bobgo.co.za/sales-channels" target="_new">Bob Go</a>';
-                echo ' and install your WooCommerce channel to be able to receive rates.';
-                echo '</div>';
-                break;
+			case 404:
+				echo wp_kses(
+					"<div style='font-size: 1rem; color: red; margin-top:10px; border: solid 1px red; padding: 15px 12px; border-radius: 10px;'>✗ Your WooCommerce channel is not installed on Bob Go. Please visit <a href='https://my.bobgo.co.za/sales-channels' target='_new'>Bob Go</a> and install your WooCommerce channel to be able to receive rates.</div>",
+					$allowed_html
+				);
+				break;
 
-            case 401:
-                echo "<div style='font-size: 1rem; color: red; margin-top:10px; border: solid 1px red; padding: 15px 12px; border-radius: 10px;'> ";
-                echo '&#10060; Rates at checkout is not enabled for your channel on Bob Go. Please visit ';
-                echo '<a href="https://my.bobgo.co.za/rates-at-checkout?tab=settings" target="_new">Bob Go</a>';
-                echo ' and enable your WooCommerce channel to be able to receive rates.';
-                echo '</div>';
-                break;
+			case 401:
+				echo wp_kses(
+					"<div style='font-size: 1rem; color: red; margin-top:10px; border: solid 1px red; padding: 15px 12px; border-radius: 10px;'>✗ Rates at checkout is not enabled for your channel on Bob Go. Please visit <a href='https://my.bobgo.co.za/rates-at-checkout?tab=settings' target='_new'>Bob Go</a> and enable your WooCommerce channel to be able to receive rates.</div>",
+					$allowed_html
+				);
+				break;
 
-            default:
-                echo "<div style='color: red; margin-top:10px'> ";
-                echo '&#10060; Failed to connect to rates at checkout. Please check your internet connection and make sure Rates at checkout is enabled for your channel on Bob Go. Please visit ';
-                echo '<a href="https://my.bobgo.co.za/rates-at-checkout?tab=settings" target="_new">Bob Go</a>';
-                echo ' and make sure your WooCommerce channel is enabled to receive rates.';
-				echo '</div>';
-        }
+			default:
+				echo wp_kses(
+					"<div style='color: red; margin-top:10px'>✗ Failed to connect to rates at checkout. Please check your internet connection and make sure Rates at checkout is enabled for your channel on Bob Go. Please visit <a href='https://my.bobgo.co.za/rates-at-checkout?tab=settings' target='_new'>Bob Go</a> and make sure your WooCommerce channel is enabled to receive rates.</div>",
+					$allowed_html
+				);
+		}
 	}
 
 	/**
@@ -409,10 +417,10 @@ class Shipping extends \WC_Shipping_Method {
 	 * @return void
 	 */
 	protected function print_test_error( $response ) {
-		echo "<div style='color: red; margin-top:10px'> ";
-		echo 'Failed to connect to rates at checkout';
-		echo $response->get_error_message(); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		echo '</div>';
+		echo wp_kses(
+			"<div style='color: red; margin-top:10px'>Failed to connect to rates at checkout: " . esc_html( $response->get_error_message() ) . '</div>',
+			array( 'div' => array( 'style' => true ) )
+		);
 	}
 
 	/**

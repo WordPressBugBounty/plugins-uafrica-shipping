@@ -1,7 +1,6 @@
 <?php
-if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) || ! WP_UNINSTALL_PLUGIN ) {
-	wp_die(); // Don't trigger uninstall on accident.
-
+if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
+	exit;
 }
 // Uninstall all traces of the uAfrica plugin.
 delete_option( 'woocommerce_uafrica_shipping_settings' );
